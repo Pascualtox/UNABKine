@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malla Interactiva · Kinesiología UNAB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+
+  :root{
+    --bg:#EEF1EE; --surface:#FFFFFF; --ink:#17231F; --ink-soft:#57685F;
+    --teal:#1B3A3D; --teal-light:#2F5D57; --coral:#C1443A; --amber:#D69A34;
+    --line:#DBE1DB; --line-soft:#E9ECE8; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .app{ font-family:'IBM Plex Sans',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; padding:28px 20px 60px; }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .header{ max-width:1220px; margin:0 auto 22px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; border-bottom:2px solid var(--teal); padding-bottom:18px; }
+  .header-left{display:flex; align-items:center; gap:16px;}
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--coral); font-weight:600; margin:0 0 4px; }
+  .title{ font-family:'Bebas Neue',sans-serif; font-size:clamp(34px,5vw,54px); letter-spacing:.01em; line-height:.9; margin:0; color:var(--teal); }
+  .subtitle{ margin:6px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:460px; }
+  .goniometer svg{ display:block; }
+  .goniometer-needle{ transform-origin:60px 60px; animation:sweep 5s ease-in-out infinite; }
+  @keyframes sweep{ 0%,100%{transform:rotate(-38deg);} 50%{transform:rotate(38deg);} }
+  @media (prefers-reduced-motion:reduce){ .goniometer-needle{ animation:none; } }
+
+  .header-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .toggle{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; }
+  .toggle input{ accent-color:var(--coral); width:15px; height:15px; }
+  button{ font-family:'IBM Plex Sans',sans-serif; cursor:pointer; border-radius:8px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal); padding:9px 16px; font-size:13px; font-weight:600; transition:background .15s, color .15s; }
+  button:hover{ background:var(--teal); color:#fff; }
+  button.primary{ background:var(--coral); border-color:var(--coral); color:#fff; }
+  button.primary:hover{ background:#a83a31; border-color:#a83a31; }
+  button.ghost{ border-color:var(--line); color:var(--ink-soft); }
+  button.ghost:hover{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  button.small{ padding:5px 10px; font-size:11.5px; border-radius:6px; }
+
+  .layout{ max-width:1220px; margin:0 auto; display:grid; grid-template-columns:340px 1fr; gap:22px; align-items:start; }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } }
+
+  .panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px; }
+  .panel h2{ font-family:'Bebas Neue',sans-serif; font-size:21px; letter-spacing:.02em; margin:0 0 12px; color:var(--teal); }
+
+  .tabs{ display:flex; gap:6px; margin-bottom:14px; background:var(--bg); padding:4px; border-radius:8px; }
+  .tab-btn{ flex:1; border:none; background:transparent; color:var(--ink-soft); padding:8px 6px; font-size:12px; font-weight:700; border-radius:6px; }
+  .tab-btn.active{ background:var(--teal); color:#fff; }
+  .tab-btn:hover{ background:var(--teal-light); color:#fff; }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  .field{ margin-bottom:12px; }
+  .field label{ display:block; font-size:11px; font-family:'IBM Plex Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }
+  .field input, .field select{ width:100%; padding:9px 10px; border:1.5px solid var(--line); border-radius:7px; font-family:'IBM Plex Sans',sans-serif; font-size:13.5px; color:var(--ink); background:#fff; }
+  .field input:focus, .field select:focus{ outline:2px solid var(--teal-light); outline-offset:1px; border-color:var(--teal-light); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .swatches{ display:flex; gap:8px; flex-wrap:wrap; }
+  .swatch{ width:26px; height:26px; border-radius:50%; border:2px solid transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .swatch.selected{ border-color:var(--ink); }
+  .swatch.selected::after{ content:'✓'; color:#fff; font-size:12px; font-weight:700; }
+  .form-actions{ display:flex; gap:8px; margin-top:14px; }
+  .form-actions button{ flex:1; }
+
+  .catalog-results{ margin-top:6px; max-height:340px; overflow-y:auto; border-top:1px solid var(--line-soft); }
+  .catalog-empty{ color:var(--ink-soft); font-size:12.5px; font-style:italic; padding:14px 0; }
+  .sec-card{ border-bottom:1px solid var(--line-soft); padding:10px 2px; }
+  .sec-top{ display:flex; align-items:center; gap:7px; margin-bottom:4px; flex-wrap:wrap; }
+  .badge{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; color:#fff; letter-spacing:.03em; }
+  .badge.TEO{ background:var(--teal); }
+  .badge.TAL{ background:var(--coral); }
+  .badge.CLI{ background:var(--amber); }
+  .sec-num{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); }
+  .sec-modalidad{ margin-left:auto; font-size:9.5px; font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); text-transform:uppercase; }
+  .sec-prof{ font-size:12px; color:var(--ink); margin-bottom:2px; }
+  .sec-time{ font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; line-height:1.5; }
+  .sec-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:6px; }
+  .sec-vac{ font-size:10.5px; color:var(--ink-soft); }
+
+  .legend{ margin-top:20px; }
+  .legend h3{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 10px; }
+  .legend-item{ display:flex; align-items:center; gap:9px; padding:8px 0; border-top:1px solid var(--line-soft); font-size:13px; }
+  .legend-item:first-of-type{ border-top:none; }
+  .legend-dot{ width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .legend-text{ flex:1; line-height:1.3; }
+  .legend-text .lname{ font-weight:600; }
+  .legend-text .lmeta{ color:var(--ink-soft); font-size:11px; font-family:'IBM Plex Mono',monospace; }
+  .legend-del{ border:none; background:none; color:var(--ink-soft); font-size:15px; padding:2px 6px; border-radius:5px; }
+  .legend-del:hover{ background:var(--coral); color:#fff; }
+  .empty-legend{ color:var(--ink-soft); font-size:12.5px; font-style:italic; }
+
+  .grid-panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:auto; }
+  .grid-scroll{ min-width:640px; }
+  .grid-header{ display:grid; grid-template-columns:56px repeat(var(--ndays,5),1fr); border-bottom:2px solid var(--teal); position:sticky; top:0; background:var(--surface); z-index:3; }
+  .day-head{ text-align:center; padding:12px 4px; font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:.03em; color:var(--teal); border-left:1px solid var(--line-soft); }
+  .grid-body{ display:grid; grid-template-columns:56px repeat(var(--ndays,5),1fr); position:relative; }
+  .time-col{ position:relative; }
+  .hour-label{ position:absolute; left:0; right:6px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); transform:translateY(-6px); }
+  .day-col{ position:relative; border-left:1px solid var(--line-soft); background-image:repeating-linear-gradient(to bottom, transparent 0, transparent 63px, var(--line-soft) 63px, var(--line-soft) 64px); }
+  .block{ position:absolute; left:3px; right:3px; border-radius:7px; padding:6px 8px; color:#fff; font-size:11.5px; line-height:1.25; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.18); transition:transform .1s; }
+  .block.TAL{ border-left:4px solid rgba(255,255,255,.65); }
+  .block:hover{ transform:scale(1.015); z-index:2; }
+  .block .bname{ font-weight:700; display:block; }
+  .block .bnrc{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:9.5px; opacity:.85; background:rgba(0,0,0,.18); padding:1px 4px; border-radius:3px; margin-left:2px; }
+  .block .bmeta{ font-family:'IBM Plex Mono',monospace; font-size:10px; opacity:.92; }
+  .block .bclose{ position:absolute; top:3px; right:5px; font-size:13px; opacity:0; transition:opacity .1s; background:rgba(0,0,0,.22); border-radius:50%; width:16px; height:16px; line-height:16px; text-align:center; }
+  .block:hover .bclose{ opacity:1; }
+
+  footer.credit{ max-width:1220px; margin:22px auto 0; color:var(--ink-soft); font-size:11.5px; font-family:'IBM Plex Mono',monospace; }
+
+  @media print{
+    .panel, .header-actions, footer.credit{ display:none !important; }
+    .layout{ display:block; }
+    .app{ padding:0; background:#fff; }
+    .grid-panel{ border:none; }
+  }
+
+
+/* ---- estilos de la malla ---- */
+
+  :root{
+    --bg:#EEF1EE; --surface:#FFFFFF; --ink:#17231F; --ink-soft:#57685F;
+    --teal:#1B3A3D; --teal-light:#2F5D57; --coral:#C1443A; --amber:#D69A34;
+    --line:#DBE1DB; --line-soft:#E9ECE8; --radius:10px; --ok:#4C8C7D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .app{ font-family:'IBM Plex Sans',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; padding:26px 18px 60px; }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .header{ max-width:1400px; margin:0 auto 20px; display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; border-bottom:2px solid var(--teal); padding-bottom:16px; }
+  .header-left{display:flex; align-items:center; gap:14px;}
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--coral); font-weight:600; margin:0 0 4px; }
+  .title{ font-family:'Bebas Neue',sans-serif; font-size:clamp(30px,4.5vw,50px); letter-spacing:.01em; line-height:.9; margin:0; color:var(--teal); }
+  .subtitle{ margin:6px 0 0; color:var(--ink-soft); font-size:13px; max-width:520px; }
+  button{ font-family:'IBM Plex Sans',sans-serif; cursor:pointer; border-radius:8px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal); padding:9px 14px; font-size:12.5px; font-weight:600; }
+  button:hover{ background:var(--teal); color:#fff; }
+  button.ghost{ border-color:var(--line); color:var(--ink-soft); }
+  button.ghost:hover{ background:var(--ink); border-color:var(--ink); color:#fff; }
+
+  .progress-wrap{ max-width:1400px; margin:0 auto 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .progress-bar{ flex:1; min-width:220px; height:10px; background:var(--line); border-radius:6px; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--ok); transition:width .3s; }
+  .progress-label{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+
+  .legend-areas{ max-width:1400px; margin:0 auto 18px; display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--ink-soft); }
+  .legend-areas span{ display:flex; align-items:center; gap:5px; }
+  .legend-areas i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  .malla{ max-width:1400px; margin:0 auto; display:grid; grid-template-columns:repeat(10,1fr); gap:10px; overflow-x:auto; }
+  @media (max-width:1100px){ .malla{ grid-template-columns:repeat(5,1fr); } }
+  @media (max-width:680px){ .malla{ grid-template-columns:repeat(2,1fr); } }
+
+  .sem-col{ display:flex; flex-direction:column; gap:8px; min-width:130px; }
+  .sem-head{ font-family:'Bebas Neue',sans-serif; font-size:17px; color:var(--teal); text-align:center; padding-bottom:6px; border-bottom:2px solid var(--teal); letter-spacing:.02em; }
+  .sem-year{ font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--ink-soft); text-align:center; text-transform:uppercase; letter-spacing:.06em; margin-top:-4px; margin-bottom:4px; }
+
+  .course{
+    background:var(--surface); border:1.5px solid var(--line); border-left:5px solid var(--area-color, var(--teal));
+    border-radius:7px; padding:8px 8px; font-size:11px; line-height:1.26; cursor:pointer;
+    min-height:60px; display:flex; flex-direction:column; justify-content:center;
+    position:relative; transition:transform .15s, box-shadow .15s, opacity .3s;
+  }
+  .course:hover{ transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,.1); }
+  .course.done{ background:var(--ok); border-color:var(--ok); color:#fff; }
+  .course.done .course-check{ opacity:1; }
+  .course.locked{ opacity:.42; cursor:not-allowed; filter:grayscale(35%); }
+  .course.locked:hover{ transform:none; box-shadow:none; }
+  .course-check{ position:absolute; top:5px; right:6px; font-size:12px; opacity:0; }
+  .course-lock{ position:absolute; top:5px; right:6px; font-size:11px; opacity:.65; }
+  .course-code{ display:block; font-family:'IBM Plex Mono',monospace; font-size:9px; opacity:.75; font-weight:600; margin-bottom:2px; }
+  .course-name{ font-weight:600; }
+
+  footer.credit{ max-width:1400px; margin:22px auto 0; color:var(--ink-soft); font-size:11px; font-family:'IBM Plex Mono',monospace; line-height:1.6; }
+
+  .tooltip-note{ max-width:1400px; margin:0 auto 16px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:12px; color:var(--ink-soft); }
+
+
+/* ---- Top-level tab nav ---- */
+.top-nav{ max-width:1220px; margin:0 auto 18px; display:flex; gap:8px; position:sticky; top:0; z-index:10; background:var(--bg); padding:10px 0 4px; }
+.top-nav button{ flex:0 0 auto; }
+.top-nav button.active{ background:var(--teal); color:#fff; }
+.view{ display:none; }
+.view.active{ display:block; }
+@media print{ .top-nav{ display:none !important; } }
+
+
+</style>
+</head>
+<body>
+<div class="app">
+
+
+  <div class="header">
+    <div class="header-left">
+      <div>
+        <p class="eyebrow">UNAB · Kinesiología · Plan de estudios vigente</p>
+        <h1 class="title">Malla Interactiva</h1>
+        <p class="subtitle">Haz clic en cada ramo para marcarlo como aprobado y ve tu avance por semestre.</p>
+      </div>
+    </div>
+    <button class="ghost" id="btnReset">Limpiar avance</button>
+    <a href="horario_kinesiologia_unab.html" style="text-decoration:none;"><button type="button">Ir a mi Horario →</button></a>
+    
+  </div>
+
+  <div class="progress-wrap">
+    <span class="progress-label" id="progressLabel">0 / 0 ramos aprobados</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="legend-areas" id="legendAreas"></div>
+
+  <div class="malla" id="malla"></div>
+
+  <footer class="credit">Fuente: malla oficial de Kinesiología, Universidad Andrés Bello (unab.cl/carreras/mallas/kinesiologia.pdf). Tu avance se guarda solo en tu cuenta.</footer>
+
+</div>
+<script>
+/* ==================== MALLA ==================== */
+
+(function(){
+  /* ---- Datos leídos desde la foto de la malla (con prerrequisitos reales) ----
+     Organizada por "hilos" temáticos (como está dibujada la malla), no por semestre,
+     ya que el diagrama no marca semestres explícitos, solo el flujo de prerrequisitos.
+     Si alguna flecha no calza con la real, avísame y la corrijo. */
+  const TRACKS = {
+    basicas:  {label:'Ciencias Básicas y Anatomía', color:'#4A5C7D'},
+    mov:      {label:'Movimiento Humano', color:'#1B3A3D'},
+    clinica:  {label:'Áreas Clínicas: Evaluación e Intervención', color:'#C1443A'},
+    integra:  {label:'Razonamiento e Integración', color:'#D69A34'},
+    gestion:  {label:'Salud Pública y Gestión', color:'#4C8C7D'},
+    invest:   {label:'Investigación', color:'#7A4C6B'},
+    general:  {label:'Formación General e Idiomas', color:'#8A8F5C'},
+    inclusion:{label:'Rehabilitación Interdisciplinaria', color:'#2F5D57'},
+    practica: {label:'Práctica Profesional', color:'#9B5B2E'}
+  };
+
+  // [semestre, codigo, nombre, track, [prerrequisitos por código]]
+  const COURSES = [
+    [1,"BIOL038","Bases Químico-Biológicas de la Célula","basicas",[]],
+    [2,"BIOL188","Fisiología General y Neurofisiología","basicas",["BIOL038"]],
+    [3,"BIOL288","Fisiología de Sistemas","basicas",["BIOL188"]],
+    [5,"KINE311","Fisiología del Ejercicio","basicas",["BIOL288"]],
+    [4,"KINE208","Fisiopatología","basicas",["BIOL288"]],
+    [1,"MORF318","Anatomía de Sistemas","basicas",[]],
+    [2,"MORF319","Anatomía Sistema Músculo Esquelético","basicas",["MORF318"]],
+
+    [1,"KINE104","Fundamentos del Movimiento Humano","mov",["MORF319"]],
+    [2,"KINE203","Kinesiología y Movimiento Humano","mov",["KINE104"]],
+    [3,"KINE209","Control Motor y Análisis Kinesiológico del Movimiento Humano","mov",["KINE203"]],
+    [1,"KINE102","Corporalidad y Actividad Física","mov",[]],
+    [2,"KINE103","Desarrollo Sensoriomotriz en Kinesiología","mov",["KINE102"]],
+    [5,"KINE314","Ciclo Vital y Funcionamiento Humano","mov",["KINE209","KINE208"]],
+
+    [6,"KINE315","Evaluación y Diagnóstico en Kinesiología Músculo Esquelética","clinica",["KINE314"]],
+    [7,"KINE415","Intervención en Kinesiología Músculo Esquelética","clinica",["KINE315","KINE418"]],
+    [6,"KINE316","Evaluación y Diagnóstico en Neurokinesiología","clinica",["KINE314"]],
+    [7,"KINE416","Intervención en Neurokinesiología","clinica",["KINE316","KINE418"]],
+    [6,"KINE318","Evaluación y Diagnóstico en Kinesiología Cardiorrespiratoria","clinica",["KINE314"]],
+    [7,"KINE414","Intervención en Kinesiología Cardiorrespiratoria","clinica",["KINE318","KINE418"]],
+    [6,"KINE418","Agentes Físicos","clinica",["KINE311"]],
+    [7,"KINE427","Actividad Física y Prescripción de Ejercicio para la Salud","clinica",["KINE311"]],
+    [8,"KINE426","Kinesiología en Áreas de Especialidad","clinica",["KINE415","KINE416","KINE414"]],
+
+    [6,"KINE207","Razonamiento en Kinesiología","integra",["KINE209"]],
+    [7,"KINE313","Integración en Kinesiología I","integra",["KINE207","KINE314"]],
+    [9,"KINE430","Integración en Kinesiología II","integra",["KINE313","KINE426"]],
+
+    [4,"SPAB113","Salud Pública","gestion",[]],
+    [5,"KINE312","Políticas en Rehabilitación e Inclusión","gestion",["SPAB113"]],
+    [6,"KINE317","Atención Primaria y Salud Familiar","gestion",["KINE312"]],
+    [7,"SPAB112","Administración y Gestión en Salud","gestion",["KINE317"]],
+    [8,"KINE428","Proyectos, Innovación y Emprendimiento en Kinesiología","gestion",["SPAB112"]],
+
+    [1,"KINE101","Fundamentos de Kinesiología","invest",[]],
+    [2,"KINE204","Epistemología y Metodología de la Investigación","invest",["KINE101"]],
+    [3,"KINE206","Análisis Cualitativo y Cuantitativo","invest",["KINE204"]],
+    [7,"KINE420","Proceso Investigativo para Licenciatura I","invest",["KINE206","CEGPC13"]],
+    [8,"KINE429","Proceso Investigativo para Licenciatura II","invest",["KINE420"]],
+
+    [1,"CEGHC11","Habilidades Comunicativas","general",[]],
+    [4,"CEGPC13","Pensamiento Crítico","general",["CEGHC11"]],
+    [1,"ING119","Inglés I","general",[]],
+    [2,"ING129","Inglés II","general",["ING119"]],
+    [3,"ING239","Inglés III","general",["ING129"]],
+    [4,"ING249","Inglés IV","general",["ING239"]],
+
+    [1,"FCRE001","Rehabilitación e Inclusión con Enfoque de Derechos Humanos","inclusion",[]],
+    [6,"FCRE002","Diagnóstico Interdisciplinario en Rehabilitación con Perspectiva Inclusiva","inclusion",["FCRE001"]],
+    [7,"FCRE003","Intervención Interdisciplinaria en Rehabilitación con Perspectiva Inclusiva","inclusion",["FCRE002"]],
+
+    [8,"KINE511","Práctica Profesional I","practica",["KINE430","KINE428","KINE429","FCRE003"]],
+    [9,"KINE512","Práctica Profesional II","practica",["KINE511"]],
+    [9,"KINE521","Práctica Profesional III","practica",["KINE512"]],
+    [10,"KINE522","Práctica Profesional IV y Trabajo Final de Titulación","practica",["KINE521"]]
+  ];
+
+  const STORAGE_KEY = 'kine-malla-unab-progreso-v2';
+  let done = {}; // { codigo: true }
+  const el = id => document.getElementById(id);
+  const byCode = {}; COURSES.forEach(c=> byCode[c[1]] = c);
+
+  async function loadState(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY);
+      if(res && res.value) done = JSON.parse(res.value);
+    }catch(e){}
+    render();
+  }
+  async function saveState(){
+    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(done)); }catch(e){ console.error(e); }
+  }
+
+  function buildLegend(){
+    el('legendAreas').innerHTML = Object.values(TRACKS).map(a=>
+      `<span><i style="background:${a.color}"></i>${a.label}</span>`
+    ).join('');
+  }
+
+  function isUnlocked(codigo){
+    const c = byCode[codigo];
+    if(!c) return true;
+    return c[4].every(req => !!done[req]);
+  }
+
+  function render(){
+    const malla = el('malla');
+    malla.innerHTML = '';
+    for(let s=1; s<=10; s++){
+      const col = document.createElement('div');
+      col.className = 'sem-col';
+      const yearLabel = 'Año ' + Math.ceil(s/2);
+      col.innerHTML = `<div class="sem-head">Sem. ${s}</div><div class="sem-year">${yearLabel}</div>`;
+      COURSES.filter(c=>c[0]===s).forEach(c=>{
+        const [sem, codigo, nombre, trackKey, prereqs] = c;
+        const track = TRACKS[trackKey];
+        const isDone = !!done[codigo];
+        const unlocked = isUnlocked(codigo);
+        const locked = !unlocked && !isDone;
+        const card = document.createElement('div');
+        card.className = 'course' + (isDone ? ' done' : '') + (locked ? ' locked' : '');
+        card.style.setProperty('--area-color', track.color);
+        const reqNames = prereqs.map(r => byCode[r] ? byCode[r][2] : r).join(', ');
+        if(locked){
+          card.title = `Requiere: ${reqNames}`;
+          card.innerHTML = `<span class="course-lock">🔒</span><span class="course-code">${codigo}</span><span class="course-name">${nombre}</span>`;
+        } else {
+          card.innerHTML = `<span class="course-check">✓</span><span class="course-code">${codigo}</span><span class="course-name">${nombre}</span>`;
+        }
+        card.addEventListener('click', ()=>{
+          if(locked) return;
+          if(done[codigo]) delete done[codigo]; else done[codigo] = true;
+          render();
+          saveState();
+        });
+        col.appendChild(card);
+      });
+      malla.appendChild(col);
+    }
+    const total = COURSES.length;
+    const doneCount = Object.keys(done).filter(k => byCode[k]).length;
+    el('progressLabel').textContent = `${doneCount} / ${total} ramos aprobados`;
+    el('progressFill').style.width = (total? (doneCount/total*100):0) + '%';
+  }
+
+  el('btnReset').addEventListener('click', ()=>{
+    if(Object.keys(done).length===0) return;
+    if(confirm('¿Borrar todo tu avance marcado?')){ done = {}; render(); saveState(); }
+  });
+
+  buildLegend();
+  loadState();
+})();
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horario · Kinesiología UNAB Viña del Mar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+
+  :root{
+    --bg:#EEF1EE; --surface:#FFFFFF; --ink:#17231F; --ink-soft:#57685F;
+    --teal:#1B3A3D; --teal-light:#2F5D57; --coral:#C1443A; --amber:#D69A34;
+    --line:#DBE1DB; --line-soft:#E9ECE8; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .app{ font-family:'IBM Plex Sans',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; padding:28px 20px 60px; }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .header{ max-width:1220px; margin:0 auto 22px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; border-bottom:2px solid var(--teal); padding-bottom:18px; }
+  .header-left{display:flex; align-items:center; gap:16px;}
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--coral); font-weight:600; margin:0 0 4px; }
+  .title{ font-family:'Bebas Neue',sans-serif; font-size:clamp(34px,5vw,54px); letter-spacing:.01em; line-height:.9; margin:0; color:var(--teal); }
+  .subtitle{ margin:6px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:460px; }
+  .goniometer svg{ display:block; }
+  .goniometer-needle{ transform-origin:60px 60px; animation:sweep 5s ease-in-out infinite; }
+  @keyframes sweep{ 0%,100%{transform:rotate(-38deg);} 50%{transform:rotate(38deg);} }
+  @media (prefers-reduced-motion:reduce){ .goniometer-needle{ animation:none; } }
+
+  .header-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .toggle{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; }
+  .toggle input{ accent-color:var(--coral); width:15px; height:15px; }
+  button{ font-family:'IBM Plex Sans',sans-serif; cursor:pointer; border-radius:8px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal); padding:9px 16px; font-size:13px; font-weight:600; transition:background .15s, color .15s; }
+  button:hover{ background:var(--teal); color:#fff; }
+  button.primary{ background:var(--coral); border-color:var(--coral); color:#fff; }
+  button.primary:hover{ background:#a83a31; border-color:#a83a31; }
+  button.ghost{ border-color:var(--line); color:var(--ink-soft); }
+  button.ghost:hover{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  button.small{ padding:5px 10px; font-size:11.5px; border-radius:6px; }
+
+  .layout{ max-width:1220px; margin:0 auto; display:grid; grid-template-columns:340px 1fr; gap:22px; align-items:start; }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } }
+
+  .panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px; }
+  .panel h2{ font-family:'Bebas Neue',sans-serif; font-size:21px; letter-spacing:.02em; margin:0 0 12px; color:var(--teal); }
+
+  .tabs{ display:flex; gap:6px; margin-bottom:14px; background:var(--bg); padding:4px; border-radius:8px; }
+  .tab-btn{ flex:1; border:none; background:transparent; color:var(--ink-soft); padding:8px 6px; font-size:12px; font-weight:700; border-radius:6px; }
+  .tab-btn.active{ background:var(--teal); color:#fff; }
+  .tab-btn:hover{ background:var(--teal-light); color:#fff; }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  .field{ margin-bottom:12px; }
+  .field label{ display:block; font-size:11px; font-family:'IBM Plex Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }
+  .field input, .field select{ width:100%; padding:9px 10px; border:1.5px solid var(--line); border-radius:7px; font-family:'IBM Plex Sans',sans-serif; font-size:13.5px; color:var(--ink); background:#fff; }
+  .field input:focus, .field select:focus{ outline:2px solid var(--teal-light); outline-offset:1px; border-color:var(--teal-light); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .swatches{ display:flex; gap:8px; flex-wrap:wrap; }
+  .swatch{ width:26px; height:26px; border-radius:50%; border:2px solid transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .swatch.selected{ border-color:var(--ink); }
+  .swatch.selected::after{ content:'✓'; color:#fff; font-size:12px; font-weight:700; }
+  .form-actions{ display:flex; gap:8px; margin-top:14px; }
+  .form-actions button{ flex:1; }
+
+  .catalog-results{ margin-top:6px; max-height:340px; overflow-y:auto; border-top:1px solid var(--line-soft); }
+  .catalog-empty{ color:var(--ink-soft); font-size:12.5px; font-style:italic; padding:14px 0; }
+  .sec-card{ border-bottom:1px solid var(--line-soft); padding:10px 2px; }
+  .sec-top{ display:flex; align-items:center; gap:7px; margin-bottom:4px; flex-wrap:wrap; }
+  .badge{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; color:#fff; letter-spacing:.03em; }
+  .badge.TEO{ background:var(--teal); }
+  .badge.TAL{ background:var(--coral); }
+  .badge.CLI{ background:var(--amber); }
+  .sec-num{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); }
+  .sec-modalidad{ margin-left:auto; font-size:9.5px; font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); text-transform:uppercase; }
+  .sec-prof{ font-size:12px; color:var(--ink); margin-bottom:2px; }
+  .sec-time{ font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; line-height:1.5; }
+  .sec-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:6px; }
+  .sec-vac{ font-size:10.5px; color:var(--ink-soft); }
+
+  .legend{ margin-top:20px; }
+  .legend h3{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 10px; }
+  .legend-item{ display:flex; align-items:center; gap:9px; padding:8px 0; border-top:1px solid var(--line-soft); font-size:13px; }
+  .legend-item:first-of-type{ border-top:none; }
+  .legend-dot{ width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .legend-text{ flex:1; line-height:1.3; }
+  .legend-text .lname{ font-weight:600; }
+  .legend-text .lmeta{ color:var(--ink-soft); font-size:11px; font-family:'IBM Plex Mono',monospace; }
+  .legend-del{ border:none; background:none; color:var(--ink-soft); font-size:15px; padding:2px 6px; border-radius:5px; }
+  .legend-del:hover{ background:var(--coral); color:#fff; }
+  .empty-legend{ color:var(--ink-soft); font-size:12.5px; font-style:italic; }
+
+  .grid-panel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:auto; }
+  .grid-scroll{ min-width:640px; }
+  .grid-header{ display:grid; grid-template-columns:56px repeat(var(--ndays,5),1fr); border-bottom:2px solid var(--teal); position:sticky; top:0; background:var(--surface); z-index:3; }
+  .day-head{ text-align:center; padding:12px 4px; font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:.03em; color:var(--teal); border-left:1px solid var(--line-soft); }
+  .grid-body{ display:grid; grid-template-columns:56px repeat(var(--ndays,5),1fr); position:relative; }
+  .time-col{ position:relative; }
+  .hour-label{ position:absolute; left:0; right:6px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); transform:translateY(-6px); }
+  .day-col{ position:relative; border-left:1px solid var(--line-soft); background-image:repeating-linear-gradient(to bottom, transparent 0, transparent 63px, var(--line-soft) 63px, var(--line-soft) 64px); }
+  .block{ position:absolute; left:3px; right:3px; border-radius:7px; padding:6px 8px; color:#fff; font-size:11.5px; line-height:1.25; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.18); transition:transform .1s; }
+  .block.TAL{ border-left:4px solid rgba(255,255,255,.65); }
+  .block:hover{ transform:scale(1.015); z-index:2; }
+  .block .bname{ font-weight:700; display:block; }
+  .block .bnrc{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:9.5px; opacity:.85; background:rgba(0,0,0,.18); padding:1px 4px; border-radius:3px; margin-left:2px; }
+  .block .bmeta{ font-family:'IBM Plex Mono',monospace; font-size:10px; opacity:.92; }
+  .block .bclose{ position:absolute; top:3px; right:5px; font-size:13px; opacity:0; transition:opacity .1s; background:rgba(0,0,0,.22); border-radius:50%; width:16px; height:16px; line-height:16px; text-align:center; }
+  .block:hover .bclose{ opacity:1; }
+
+  footer.credit{ max-width:1220px; margin:22px auto 0; color:var(--ink-soft); font-size:11.5px; font-family:'IBM Plex Mono',monospace; }
+
+  @media print{
+    .panel, .header-actions, footer.credit{ display:none !important; }
+    .layout{ display:block; }
+    .app{ padding:0; background:#fff; }
+    .grid-panel{ border:none; }
+  }
+
+
+/* ---- estilos de la malla ---- */
+
+  :root{
+    --bg:#EEF1EE; --surface:#FFFFFF; --ink:#17231F; --ink-soft:#57685F;
+    --teal:#1B3A3D; --teal-light:#2F5D57; --coral:#C1443A; --amber:#D69A34;
+    --line:#DBE1DB; --line-soft:#E9ECE8; --radius:10px; --ok:#4C8C7D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .app{ font-family:'IBM Plex Sans',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; padding:26px 18px 60px; }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .header{ max-width:1400px; margin:0 auto 20px; display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; border-bottom:2px solid var(--teal); padding-bottom:16px; }
+  .header-left{display:flex; align-items:center; gap:14px;}
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--coral); font-weight:600; margin:0 0 4px; }
+  .title{ font-family:'Bebas Neue',sans-serif; font-size:clamp(30px,4.5vw,50px); letter-spacing:.01em; line-height:.9; margin:0; color:var(--teal); }
+  .subtitle{ margin:6px 0 0; color:var(--ink-soft); font-size:13px; max-width:520px; }
+  button{ font-family:'IBM Plex Sans',sans-serif; cursor:pointer; border-radius:8px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal); padding:9px 14px; font-size:12.5px; font-weight:600; }
+  button:hover{ background:var(--teal); color:#fff; }
+  button.ghost{ border-color:var(--line); color:var(--ink-soft); }
+  button.ghost:hover{ background:var(--ink); border-color:var(--ink); color:#fff; }
+
+  .progress-wrap{ max-width:1400px; margin:0 auto 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .progress-bar{ flex:1; min-width:220px; height:10px; background:var(--line); border-radius:6px; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--ok); transition:width .3s; }
+  .progress-label{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+
+  .legend-areas{ max-width:1400px; margin:0 auto 18px; display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--ink-soft); }
+  .legend-areas span{ display:flex; align-items:center; gap:5px; }
+  .legend-areas i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  .malla{ max-width:1400px; margin:0 auto; display:grid; grid-template-columns:repeat(10,1fr); gap:10px; overflow-x:auto; }
+  @media (max-width:1100px){ .malla{ grid-template-columns:repeat(5,1fr); } }
+  @media (max-width:680px){ .malla{ grid-template-columns:repeat(2,1fr); } }
+
+  .sem-col{ display:flex; flex-direction:column; gap:8px; min-width:130px; }
+  .sem-head{ font-family:'Bebas Neue',sans-serif; font-size:17px; color:var(--teal); text-align:center; padding-bottom:6px; border-bottom:2px solid var(--teal); letter-spacing:.02em; }
+  .sem-year{ font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--ink-soft); text-align:center; text-transform:uppercase; letter-spacing:.06em; margin-top:-4px; margin-bottom:4px; }
+
+  .course{
+    background:var(--surface); border:1.5px solid var(--line); border-left:5px solid var(--area-color, var(--teal));
+    border-radius:7px; padding:8px 8px; font-size:11px; line-height:1.26; cursor:pointer;
+    min-height:60px; display:flex; flex-direction:column; justify-content:center;
+    position:relative; transition:transform .15s, box-shadow .15s, opacity .3s;
+  }
+  .course:hover{ transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,.1); }
+  .course.done{ background:var(--ok); border-color:var(--ok); color:#fff; }
+  .course.done .course-check{ opacity:1; }
+  .course.locked{ opacity:.42; cursor:not-allowed; filter:grayscale(35%); }
+  .course.locked:hover{ transform:none; box-shadow:none; }
+  .course-check{ position:absolute; top:5px; right:6px; font-size:12px; opacity:0; }
+  .course-lock{ position:absolute; top:5px; right:6px; font-size:11px; opacity:.65; }
+  .course-code{ display:block; font-family:'IBM Plex Mono',monospace; font-size:9px; opacity:.75; font-weight:600; margin-bottom:2px; }
+  .course-name{ font-weight:600; }
+
+  footer.credit{ max-width:1400px; margin:22px auto 0; color:var(--ink-soft); font-size:11px; font-family:'IBM Plex Mono',monospace; line-height:1.6; }
+
+  .tooltip-note{ max-width:1400px; margin:0 auto 16px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:12px; color:var(--ink-soft); }
+
+
+/* ---- Top-level tab nav ---- */
+.top-nav{ max-width:1220px; margin:0 auto 18px; display:flex; gap:8px; position:sticky; top:0; z-index:10; background:var(--bg); padding:10px 0 4px; }
+.top-nav button{ flex:0 0 auto; }
+.top-nav button.active{ background:var(--teal); color:#fff; }
+.view{ display:none; }
+.view.active{ display:block; }
+@media print{ .top-nav{ display:none !important; } }
+
+
+</style>
+</head>
+<body>
+<div class="app">
+
+
+
+  <div class="header">
+    <div class="header-left">
+      <div class="goniometer" aria-hidden="true">
+        <svg width="56" height="56" viewBox="0 0 120 120">
+          <path d="M15 90 A45 45 0 0 1 105 90" fill="none" stroke="#1B3A3D" stroke-width="4"/>
+          <circle cx="60" cy="90" r="3" fill="#1B3A3D"/>
+          <g class="goniometer-needle"><line x1="60" y1="90" x2="60" y2="30" stroke="#C1443A" stroke-width="4" stroke-linecap="round"/></g>
+          <text x="14" y="105" font-family="IBM Plex Mono" font-size="9" fill="#57685F">0°</text>
+          <text x="96" y="105" font-family="IBM Plex Mono" font-size="9" fill="#57685F">180°</text>
+        </svg>
+      </div>
+      <div>
+        <p class="eyebrow">UNAB · Sede Viña del Mar</p>
+        <h1 class="title">Horario Kinesiología</h1>
+        <p class="subtitle">Busca tu ramo en el catálogo 202620 y agrega la sección con un clic, o crea bloques personalizados.</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <label class="toggle"><input type="checkbox" id="toggleSabado"> Incluir sábado</label>
+      <a href="malla_kinesiologia_unab.html" style="text-decoration:none;"><button type="button" class="ghost">Ver mi Malla →</button></a>
+      <button class="ghost" id="btnClear">Limpiar todo</button>
+      <button class="primary" id="btnPrint">Imprimir / PDF</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="catalogo">Catálogo UNAB</button>
+        <button class="tab-btn" data-tab="manual">Personalizado</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-catalogo">
+        <h2>Buscar ramo</h2>
+        <div class="field">
+          <label for="buscador">Asignatura o código</label>
+          <input type="text" id="buscador" placeholder="Ej: Fisiopatología, KINE208...">
+        </div>
+        <div class="catalog-results" id="catalogResults">
+          <p class="catalog-empty">Escribe el nombre de un ramo (ej. "Anatomía", "Inglés", "Fisiología") para ver sus secciones disponibles.</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-manual">
+        <h2>Bloque personalizado</h2>
+        <form id="classForm">
+          <div class="field">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" placeholder="Ej: Entrenamiento BJJ" required>
+          </div>
+          <div class="field">
+            <label for="dia">Día</label>
+            <select id="dia">
+              <option value="lunes">Lunes</option><option value="martes">Martes</option>
+              <option value="miercoles">Miércoles</option><option value="jueves">Jueves</option>
+              <option value="viernes">Viernes</option><option value="sabado">Sábado</option>
+            </select>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="inicio">Inicio</label><input type="time" id="inicio" value="08:30" required></div>
+            <div class="field"><label for="fin">Término</label><input type="time" id="fin" value="10:00" required></div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="tipo">Tipo</label>
+              <select id="tipo"><option>Cátedra</option><option>Taller</option><option>Laboratorio</option><option>Personal</option></select>
+            </div>
+            <div class="field"><label for="sala">Sala</label><input type="text" id="sala" placeholder="Opcional"></div>
+          </div>
+          <div class="field"><label for="profesor">Profesor(a)</label><input type="text" id="profesor" placeholder="Opcional"></div>
+          <div class="field"><label>Color</label><div class="swatches" id="swatches"></div></div>
+          <div class="form-actions">
+            <button type="submit" class="primary" id="btnSubmit">Agregar</button>
+            <button type="button" class="ghost" id="btnCancelEdit" style="display:none;">Cancelar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="legend">
+        <h3>Bloques en tu horario</h3>
+        <div id="legendList"><p class="empty-legend">Aún no agregas ninguna clase.</p></div>
+      </div>
+    </div>
+
+    <div class="grid-panel">
+      <div class="grid-scroll">
+        <div class="grid-header" id="gridHeader"></div>
+        <div class="grid-body" id="gridBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="credit">Horario personal — Kinesiología, Universidad Andrés Bello, sede Viña del Mar. Catálogo: Programación Académica 202620 (generado 15/07/2026). Tus datos se guardan solo en tu cuenta.</footer>
+
+</div>
+<script>
+
+
+(function(){
+  /* ---------- CATÁLOGO REAL (Programación Académica 202620, UNAB19300 Kinesiología, Viña del Mar) ---------- */
+  /* [nrc, tipo, codigo, seccion, titulo, vacantes, profesor, horario_raw, modalidad] */
+  const RAW = [
+[2379,"TEO","MORF318","300","ANATOMIA DE SISTEMAS",50,"Gustavo Oyanedel Amaro","VI 12:10 A 13:50 VM-SAL506","PRESENCIAL"],
+[2380,"TAL","MORF318","301","ANATOMIA DE SISTEMAS",25,"Cristian Vega Olivero","SA 08:30 A 12:00 SIM.VM-","PRESENCIAL"],
+[2381,"TAL","MORF318","302","ANATOMIA DE SISTEMAS",25,"Gustavo Oyanedel Amaro","SA 08:30 A 12:00 SIM.VM-","PRESENCIAL"],
+[2382,"TEO","MORF319","300","ANATOMIA SISTEMA MUSCULO ESQUELETICO",60,"Cristian Vega Olivero","MA 12:10 A 13:50 VM-SAL306","PRESENCIAL"],
+[2383,"TEO","MORF319","301","ANATOMIA SISTEMA MUSCULO ESQUELETICO",58,"Jose Fuentes Silva","MA 12:10 A 13:50 VM-SAL701","PRESENCIAL"],
+[2384,"TEO","MORF319","302","ANATOMIA SISTEMA MUSCULO ESQUELETICO",61,"Julio Figueroa Puig","MA 12:10 A 13:50 VM-SAL617","PRESENCIAL"],
+[2385,"TAL","MORF319","303","ANATOMIA SISTEMA MUSCULO ESQUELETICO",31,"Julio Figueroa Puig","JU 08:30 A 12:00 -","PRESENCIAL"],
+[2386,"TAL","MORF319","304","ANATOMIA SISTEMA MUSCULO ESQUELETICO",30,"Cristian Vega Olivero","JU 08:30 A 12:00 SIM.VM-","PRESENCIAL"],
+[2389,"TAL","MORF319","307","ANATOMIA SISTEMA MUSCULO ESQUELETICO",30,"Julio Figueroa Puig","VI 08:30 A 12:00 SIM.VM-","PRESENCIAL"],
+[2390,"TAL","MORF319","308","ANATOMIA SISTEMA MUSCULO ESQUELETICO",30,"Alejandro Bruna Mejias","VI 08:30 A 12:00 SIM.VM-","PRESENCIAL"],
+[1270,"TEO","SPAB112","303","ADMINISTRACION Y GESTION EN SALUD",45,"Sebastian Elissetche Balbontin","VI 15:50 A 17:30 -","VIRTUAL"],
+[12044,"TAL","FCRE003","312","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Constanza Estay Jeria","JU 15:50 A 18:25 VM-SAL105","PRESENCIAL"],
+[12047,"TAL","FCRE003","315","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Valentina Machuca Machuca","JU 15:50 A 18:25 VM-SAL618","PRESENCIAL"],
+[12050,"TAL","FCRE003","318","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Luzmira Estivill Diaz","JU 13:05 A 15:40 VM-SAL404","PRESENCIAL"],
+[12053,"TAL","FCRE003","321","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Luzmira Estivill Diaz","JU 15:50 A 18:25 VM-SAL400","PRESENCIAL"],
+[12056,"TAL","FCRE003","324","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Por definir","JU 15:50 A 18:25 VM-SAL709","PRESENCIAL"],
+[12057,"TAL","FCRE003","325","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Por definir","JU 15:50 A 18:25 VM-SAL300","PRESENCIAL"],
+[11996,"TAL","FCRE002","300","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Oriana Rozas Maureira","VI 12:10 A 13:50 VM-SAL509","PRESENCIAL"],
+[11999,"TAL","FCRE002","303","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Daniela Guzman Smok","VI 14:00 A 15:40 VM-SAL404","PRESENCIAL"],
+[12002,"TAL","FCRE002","306","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Luzmira Estivill Diaz","VI 12:10 A 13:50 VM-SAL508","PRESENCIAL"],
+[12005,"TAL","FCRE002","309","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Por definir","VI 12:10 A 13:50 VM-SAL604","PRESENCIAL"],
+[12008,"TAL","FCRE002","312","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Daniela Guzman Smok","VI 12:10 A 13:50 VM-SAL209","PRESENCIAL"],
+[12011,"TAL","FCRE002","315","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Carolina Santander Catrin","VI 12:10 A 13:50 VM-SAL614","PRESENCIAL"],
+[12014,"TAL","FCRE002","318","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Oriana Rozas Maureira","VI 14:00 A 15:40 VM-SAL704","PRESENCIAL"],
+[12018,"TAL","FCRE002","322","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Ximena Aranda Aguirre","VI 14:00 A 15:40 VM-SAL204","PRESENCIAL"],
+[12020,"TAL","FCRE002","324","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Claudio Venegas Perez","VI 14:00 A 15:40 VM-SAL501","PRESENCIAL"],
+[12023,"TAL","FCRE002","327","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Daniela Guzman Smok","VI 15:50 A 17:30 VM-SAL207","PRESENCIAL"],
+[12026,"TAL","FCRE002","330","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Fernanda Morales Del Rio","VI 12:10 A 13:50 VM-SAL217","PRESENCIAL"],
+[12027,"TAL","FCRE002","331","DIAGNOSTICO INTERDISCIPLINARIO EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Valentina Machuca Machuca","VI 14:00 A 15:40 VM-SAL207","PRESENCIAL"],
+[12032,"TAL","FCRE003","300","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Constanza Estay Jeria","JU 13:05 A 15:40 VM-SAL213","PRESENCIAL"],
+[12035,"TAL","FCRE003","303","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Por definir","JU 12:10 A 14:45 VM-SAL504","PRESENCIAL"],
+[12038,"TAL","FCRE003","306","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Por definir","JU 13:05 A 15:40 VM-SAL300","PRESENCIAL"],
+[12041,"TAL","FCRE003","309","INTERVENCION INTERDISCIPLINARIA EN REHABILITACION CON PERSPECTIVA INCLUSIVA",13,"Daniela Guzman Smok","JU 13:05 A 15:40 VM-SAL119","PRESENCIAL"],
+[9053,"TAL","KINE104","300","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Marco Higueras Contreras","MI 14:00 A 17:30 VM-SAL103","PRESENCIAL"],
+[9054,"TAL","KINE104","301","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Marco Higueras Contreras","LU 14:00 A 17:30 VM-KIN223","PRESENCIAL"],
+[9055,"TAL","KINE104","302","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Claudia Cuesta Fuentes","LU 08:30 A 12:00 VM-SAL616","PRESENCIAL"],
+[9056,"TAL","KINE104","303","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Por definir","MI 08:30 A 12:00 VM-KIN226","PRESENCIAL"],
+[9057,"TAL","KINE104","304","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Claudia Cuesta Fuentes","MA 08:30 A 12:00 VM-KIN223","PRESENCIAL"],
+[9058,"TAL","KINE104","305","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Gustavo Oyanedel Amaro","LU 14:55 A 18:25 VM-KIN226","PRESENCIAL"],
+[9059,"TAL","KINE104","306","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Sebastian Gonzalez Kroyer","LU 08:30 A 12:00 VM-KIN220","PRESENCIAL"],
+[9060,"TAL","KINE104","307","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Sebastian Gonzalez Kroyer","JU 08:30 A 12:00 VM-KIN220","PRESENCIAL"],
+[9061,"TAL","KINE104","308","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Sebastian Gonzalez Kroyer","MI 08:30 A 12:00 VM-KIN228","PRESENCIAL"],
+[9062,"TAL","KINE104","309","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Sebastian Gonzalez Kroyer","MA 08:30 A 12:00 VM-KIN221","PRESENCIAL"],
+[9063,"TAL","KINE104","310","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Andre Choupay Magna","LU 08:30 A 12:00 VM-KIN228","PRESENCIAL"],
+[9064,"TAL","KINE104","311","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Andre Choupay Magna","MA 08:30 A 12:00 VM-ATM203","PRESENCIAL"],
+[9065,"TAL","KINE104","312","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Andre Choupay Magna","VI 08:30 A 12:00 VM-KIN225","PRESENCIAL"],
+[9066,"TAL","KINE104","313","FUNDAMENTOS DEL MOVIMIENTO HUMANO",16,"Por definir","LU 08:30 A 12:00 VM-KIN222","PRESENCIAL"],
+[9136,"TAL","KINE317","300","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Claudia Cuesta Fuentes","MI 13:05 A 16:35 VM-SAL725","PRESENCIAL"],
+[9137,"TAL","KINE317","301","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Claudia Cuesta Fuentes","MI 08:30 A 12:00 VM-SAL614","PRESENCIAL"],
+[9138,"TAL","KINE317","302","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Claudia Cuesta Fuentes","VI 08:30 A 12:00 VM-SAL706","PRESENCIAL"],
+[9139,"TAL","KINE317","303","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Lina Astorga Vidal","LU 15:50 A 19:20 VM-SAL613","PRESENCIAL"],
+[9140,"TAL","KINE317","304","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Lina Astorga Vidal","LU 12:10 A 15:40 VM-SAL607","PRESENCIAL"],
+[9141,"TAL","KINE317","305","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Lina Astorga Vidal","LU 08:30 A 12:00 VM-SAL607","PRESENCIAL"],
+[9142,"TAL","KINE317","306","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Claudia Cuesta Fuentes","JU 13:05 A 16:35 VM-SAL707","PRESENCIAL"],
+[9143,"TAL","KINE317","307","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Claudia Cuesta Fuentes","JU 08:30 A 12:00 VM-SAL304","PRESENCIAL"],
+[9144,"TAL","KINE317","308","ATENCION PRIMARIA Y SALUD FAMILIAR",16,"Por definir","MI 13:05 A 16:35 VM-SAL618","PRESENCIAL"],
+[9145,"TAL","KINE318","300","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Katherina Espinoza Macher","LU 08:30 A 11:05 VM-KIN226 ; VI 08:30 A 11:05 VM-KIN226","PRESENCIAL"],
+[9146,"TAL","KINE318","301","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Jennyfer Castro Quiroz","VI 14:55 A 17:30 VM-KIN224 ; MA 14:55 A 17:30 VM-KIN226","PRESENCIAL"],
+[9147,"TAL","KINE318","302","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Pablo Manriquez Villarroel","LU 08:30 A 11:05 VM-KIN224 ; MI 13:05 A 15:40 VM-KIN226","PRESENCIAL"],
+[9148,"TAL","KINE318","303","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Pablo Manriquez Villarroel","MI 15:50 A 18:25 VM-KIN226 ; LU 11:15 A 13:50 VM-KIN224","PRESENCIAL"],
+[9149,"TAL","KINE318","304","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Pablo Manriquez Villarroel","LU 15:50 A 18:25 VM-KIN220 ; VI 12:10 A 14:45 VM-KIN224","PRESENCIAL"],
+[9150,"TAL","KINE318","305","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Andrea Espinoza Alvarado","JU 08:30 A 11:05 VM-KIN224 ; MI 08:30 A 11:05 VM-KIN224","PRESENCIAL"],
+[9151,"TAL","KINE318","306","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Gonzalo Pavez Perez","JU 15:50 A 18:25 VM-KIN226 ; MA 15:50 A 18:25 VM-KIN224","PRESENCIAL"],
+[9152,"TAL","KINE318","307","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Andres Cisternas Guerra","MA 08:30 A 11:05 VM-KIN224 ; MI 11:15 A 13:50 VM-KIN224","PRESENCIAL"],
+[9153,"TAL","KINE318","308","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Andres Cisternas Guerra","MA 11:15 A 13:50 VM-KIN224 ; MI 14:00 A 16:35 VM-KIN224","PRESENCIAL"],
+[9154,"TAL","KINE318","309","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA CARDIORESPIRATORIA",16,"Por definir","LU 11:15 A 13:50 VM-KIN226 ; MI 11:15 A 13:50 VM-KIN227","PRESENCIAL"],
+[3286,"TEO","ING239","300","INGLES III",35,"Alejandra San Martin Jana","JU 14:00 A 16:35 VM-SAL214","BLENDED"],
+[3287,"TEO","ING239","301","INGLES III",35,"Maria Fuentes Llanos","MI 08:30 A 11:05 VM-SAL509","BLENDED"],
+[3288,"TEO","ING239","302","INGLES III",35,"Alberto Nunez Godoy","MA 11:15 A 13:50 VM-SAL509","BLENDED"],
+[3289,"TEO","ING239","303","INGLES III",35,"Marco Aracena Rosales","MI 14:00 A 16:35 VM-SAL401","BLENDED"],
+[3290,"TEO","ING239","304","INGLES III",35,"Alberto Nunez Godoy","MA 08:30 A 11:05 VM-SAL210","BLENDED"],
+[9155,"TAL","KINE426","300","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Alejandra Salinas Molina","VI 14:00 A 16:35 VM-KIN227 ; MA 14:00 A 16:35 VM-SAL614","PRESENCIAL"],
+[9156,"TAL","KINE426","301","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Yazmin Cavallari Drey","VI 14:00 A 16:35 VM-KIN223 ; MA 14:00 A 16:35 VM-KIN223","PRESENCIAL"],
+[9157,"TAL","KINE426","302","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Sebastian Paez Fuentes","VI 14:00 A 16:35 VM-KIN222 ; MA 14:00 A 16:35 VM-KIN222","PRESENCIAL"],
+[9158,"TAL","KINE426","303","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Marcela Uribe Campos","MA 14:00 A 16:35 VM-SAL503 ; VI 14:00 A 16:35 VM-SAL116","PRESENCIAL"],
+[9159,"TAL","KINE426","304","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Mauricio Montecinos Vidal","MA 16:45 A 19:20 VM-KIN225 ; VI 16:45 A 19:20 VM-KIN227","PRESENCIAL"],
+[9160,"TAL","KINE426","305","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Yazmin Cavallari Drey","VI 16:45 A 19:20 VM-KIN223 ; MA 16:45 A 19:20 VM-KIN223","PRESENCIAL"],
+[9161,"TAL","KINE426","306","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Sebastian Paez Fuentes","VI 16:45 A 19:20 VM-KIN222 ; MA 16:45 A 19:20 VM-KIN222","PRESENCIAL"],
+[9162,"TAL","KINE426","307","KINESIOLOGIA EN AREAS DE ESPECIALIDAD",16,"Daniela Gonzalez Catalan","VI 16:45 A 19:20 VM-SAL113 ; MA 16:45 A 19:20 VM-SAL607","PRESENCIAL"],
+[9163,"TAL","KINE427","300","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Juan Alarcon Cortes","MI 15:50 A 18:25 VM-KIN220","PRESENCIAL"],
+[9164,"TAL","KINE427","301","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Juan Alarcon Cortes","MI 12:10 A 15:40 VM-KIN220","PRESENCIAL"],
+[9165,"TAL","KINE427","302","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Antonio Lopez Fuenzalida","VI 08:30 A 12:00 VM-KIN220","PRESENCIAL"],
+[9166,"TAL","KINE427","303","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Por definir","SA 08:30 A 12:00 VM-KIN221","PRESENCIAL"],
+[9167,"TAL","KINE427","304","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Antonio Lopez Fuenzalida","MI 08:30 A 12:00 VM-KIN220","PRESENCIAL"],
+[9168,"TAL","KINE427","305","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Felipe Villanueva Munoz","MI 08:30 A 12:00 VM-ATM203","PRESENCIAL"],
+[9169,"TAL","KINE427","306","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Felipe Villanueva Munoz","VI 08:30 A 12:00 VM-KIN221","PRESENCIAL"],
+[9170,"TAL","KINE427","307","ACTIVIDAD FISICA Y PRESCRIPCION DE EJERCICIO PARA LA SALUD",16,"Por definir","SA 08:30 A 12:00 VM-KIN220","PRESENCIAL"],
+[9171,"TAL","KINE428","300","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Paola Quezada Escobar","JU 08:30 A 12:00 VM-SAL402","PRESENCIAL"],
+[9172,"TAL","KINE428","301","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Paola Quezada Escobar","VI 08:30 A 12:00 VM-SAL507","PRESENCIAL"],
+[9173,"TAL","KINE428","302","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Paola Quezada Escobar","JU 12:10 A 15:40 VM-KIN228","PRESENCIAL"],
+[9174,"TAL","KINE428","303","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Bernardita Lopez Radrigan","MA 08:30 A 12:00 VM-SAL407","PRESENCIAL"],
+[9175,"TAL","KINE428","304","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Bernardita Lopez Radrigan","LU 08:30 A 12:00 VM-SAL614","PRESENCIAL"],
+[9176,"TAL","KINE428","305","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Bernardita Lopez Radrigan","LU 12:10 A 15:40 VM-SAL614","PRESENCIAL"],
+[9177,"TAL","KINE428","306","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Por definir","JU 08:30 A 12:00 VM-SAL108","PRESENCIAL"],
+[9178,"TAL","KINE428","307","PROYECTOS, INNOVACION Y EMPRENDIMIENTO EN KINESIOLOGIA",16,"Por definir","JU 08:30 A 12:00 VM-SAL119","PRESENCIAL"],
+[9179,"TAL","KINE429","300","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Bastian Guerra Araya","MA 13:05 A 16:35 VM-SAL010","PRESENCIAL"],
+[9180,"TAL","KINE429","301","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Pablo Manriquez Villarroel","JU 11:15 A 13:50 VM-SAL003","PRESENCIAL"],
+[9181,"TAL","KINE429","302","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Waleska Reyes Ferrada","MA 08:30 A 12:00 VM-SAL115","PRESENCIAL"],
+[9182,"TAL","KINE429","303","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paula Plaza Arancibia","LU 08:30 A 12:00 VM-SAL005","PRESENCIAL"],
+[9183,"TAL","KINE429","304","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Marcelo Tuesta Roa","SA 08:30 A 12:00 VM-KIN219","PRESENCIAL"],
+[9184,"TAL","KINE429","305","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Cristian Cortes Quinchavil","MA 08:30 A 12:00 VM-SAL006","PRESENCIAL"],
+[9185,"TAL","KINE429","306","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Marcela Uribe Campos","MA 08:30 A 12:00 VM-SAL007","PRESENCIAL"],
+[9186,"TAL","KINE429","307","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paulina Ibacache Saavedra","MA 08:30 A 12:00 VM-SAL008","PRESENCIAL"],
+[9187,"TAL","KINE429","308","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paula Plaza Arancibia","MI 08:30 A 12:00 VM-SAL005","PRESENCIAL"],
+[9188,"TAL","KINE429","309","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paula Plaza Arancibia","JU 08:30 A 12:00 VM-SAL008","PRESENCIAL"],
+[9189,"TAL","KINE429","310","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paula Plaza Arancibia","LU 12:10 A 15:40 VM-SAL001","PRESENCIAL"],
+[9190,"TAL","KINE429","311","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paula Plaza Arancibia","MA 08:30 A 12:00 VM-SAL602","PRESENCIAL"],
+[9191,"TAL","KINE429","312","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Marcelo Tuesta Roa","MA 08:30 A 12:00 VM-SAL002","PRESENCIAL"],
+[9192,"TAL","KINE429","313","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Ruben Garcia Aguirre","MA 08:30 A 12:00 VM-SAL009","PRESENCIAL"],
+[9193,"TAL","KINE429","314","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paola Quezada Escobar","VI 12:10 A 15:40 VM-SAL009","PRESENCIAL"],
+[9194,"TAL","KINE429","315","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Cristian Cuadra Gonzalez","MA 08:30 A 12:00 VM-SAL504","PRESENCIAL"],
+[9195,"TAL","KINE429","316","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Waleska Reyes Ferrada","LU 15:50 A 19:20 VM-SAL002","PRESENCIAL"],
+[9196,"TAL","KINE429","317","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Cristian Cortes Quinchavil","LU 14:55 A 18:25 VM-SAL003","PRESENCIAL"],
+[9197,"TAL","KINE429","318","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Paulina Ibacache Saavedra","LU 15:50 A 19:20 VM-SAL004","PRESENCIAL"],
+[9198,"TAL","KINE429","319","PROCESO INVESTIGATIVO PARA LICENCIATURA II",5,"Gabriel Garrido Cerda","MI 13:05 A 16:35 VM-SAL008","PRESENCIAL"],
+[9199,"TAL","KINE429","320","PROCESO INVESTIGATIVO PARA LICENCIATURA II",5,"Gabriel Garrido Cerda","MA 08:30 A 12:00 VM-SAL005","PRESENCIAL"],
+[9200,"TAL","KINE429","321","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Ignacio Novoa Cornejo","LU 15:50 A 19:20 VM-SAL006","PRESENCIAL"],
+[9201,"TAL","KINE429","322","PROCESO INVESTIGATIVO PARA LICENCIATURA II",5,"Andrea Espinoza Alvarado","JU 11:15 A 14:45 VM-SAL007","PRESENCIAL"],
+[9202,"TAL","KINE429","323","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 13:05 A 16:35 VM-SAL004","PRESENCIAL"],
+[9203,"TAL","KINE429","324","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 13:05 A 16:35 VM-SAL005","PRESENCIAL"],
+[9204,"TAL","KINE429","325","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 13:05 A 16:35 VM-SAL003","PRESENCIAL"],
+[9205,"TAL","KINE429","326","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 13:05 A 16:35 VM-SAL006","PRESENCIAL"],
+[9206,"TAL","KINE429","327","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 13:05 A 16:35 VM-SAL115","PRESENCIAL"],
+[9207,"TAL","KINE429","328","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 13:05 A 16:35 VM-SAL008","PRESENCIAL"],
+[9208,"TAL","KINE429","329","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 08:30 A 12:00 VM-SAL004","PRESENCIAL"],
+[9209,"TAL","KINE429","330","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","LU 14:55 A 18:25 VM-SAL005","PRESENCIAL"],
+[9210,"TAL","KINE429","331","PROCESO INVESTIGATIVO PARA LICENCIATURA II",4,"Por definir","MA 13:05 A 16:35 VM-SAL009","PRESENCIAL"],
+[9211,"TAL","KINE430","300","INTEGRACION EN KINESIOLOGIA II",16,"Gabriela Calderon Palacios","LU 12:10 A 14:45 VM-KIN227","PRESENCIAL"],
+[9212,"TAL","KINE430","301","INTEGRACION EN KINESIOLOGIA II",16,"Gabriela Calderon Palacios","MI 08:30 A 11:05 VM-KIN221","PRESENCIAL"],
+[9213,"TAL","KINE430","302","INTEGRACION EN KINESIOLOGIA II",16,"Gabriela Calderon Palacios","MI 12:10 A 14:45 VM-KIN221","PRESENCIAL"],
+[9214,"TAL","KINE430","303","INTEGRACION EN KINESIOLOGIA II",16,"Gabriela Calderon Palacios","VI 09:25 A 12:00 VM-KIN222","PRESENCIAL"],
+[9215,"TAL","KINE430","304","INTEGRACION EN KINESIOLOGIA II",16,"Marco Venegas Prado","JU 09:25 A 12:00 VM-KIN221","PRESENCIAL"],
+[9216,"TAL","KINE430","305","INTEGRACION EN KINESIOLOGIA II",16,"Marcela Uribe Campos","LU 10:20 A 12:55 VM-KIN221","PRESENCIAL"],
+[9217,"TAL","KINE430","306","INTEGRACION EN KINESIOLOGIA II",16,"Por definir","JU 11:15 A 13:50 VM-KIN224","PRESENCIAL"],
+[9218,"TAL","KINE430","307","INTEGRACION EN KINESIOLOGIA II",16,"Por definir","LU 15:50 A 18:25 VM-KIN225","PRESENCIAL"],
+[12936,"CLI","KINE521","300","PRACTICA PROFESIONAL III",60,"Por definir","SA 08:30 A 09:15 -","PRESENCIAL"],
+[12940,"CLI","KINE522","300","PRACTICA PROFESIONAL IV Y TRABAJO FINAL DE TITULACION",60,"Por definir","SA 09:25 A 10:10 -","PRESENCIAL"],
+[3333,"TEO","ING249","362","INGLES IV",35,"Katheryn Haye Espinal","LU 19:00 A 21:25 -","E-LEARNING"],
+[9067,"TAL","KINE206","300","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Marion Ramirez Gonzalez","MI 13:05 A 16:35 VM-SAL209","PRESENCIAL"],
+[9068,"TAL","KINE206","301","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Joana Zarate Jimenez","MI 12:10 A 15:40 VM-SAL117","PRESENCIAL"],
+[9069,"TAL","KINE206","302","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Joana Zarate Jimenez","JU 08:30 A 12:00 VM-SAL707","PRESENCIAL"],
+[9070,"TAL","KINE206","303","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Joana Zarate Jimenez","LU 12:10 A 15:40 VM-SAL209","PRESENCIAL"],
+[9071,"TAL","KINE206","304","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Joana Zarate Jimenez","MA 14:00 A 17:30 VM-SAL707","PRESENCIAL"],
+[9072,"TAL","KINE206","305","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Marion Ramirez Gonzalez","LU 12:10 A 13:50 VM-SAL117 ; MI 16:45 A 18:25 VM-SAL709","PRESENCIAL"],
+[9073,"TAL","KINE206","306","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Marion Ramirez Gonzalez","MI 08:30 A 12:00 VM-SAL217","PRESENCIAL"],
+[9074,"TAL","KINE206","307","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Marion Ramirez Gonzalez","MA 08:30 A 12:00 VM-SAL600","PRESENCIAL"],
+[9075,"TAL","KINE206","308","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Marion Ramirez Gonzalez","LU 08:30 A 12:00 VM-SAL209","PRESENCIAL"],
+[9076,"TAL","KINE206","309","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Joana Zarate Jimenez","MA 08:30 A 12:00 VM-SAL725","PRESENCIAL"],
+[9077,"TAL","KINE206","310","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Alvaro Reyes Ponce","MA 14:00 A 17:30 VM-SAL300","PRESENCIAL"],
+[9078,"TAL","KINE206","311","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Por definir","JU 08:30 A 12:00 VM-SAL607","PRESENCIAL"],
+[9079,"TAL","KINE206","312","ANALISIS CUALITATIVO Y CUANTITATIVO",16,"Por definir","MA 14:00 A 17:30 VM-SAL217","PRESENCIAL"],
+[9081,"TAL","KINE207","300","RAZONAMIENTO EN KINESIOLOGIA",16,"Felipe Carrasco Silva","JU 08:30 A 12:00 VM-ATM203","PRESENCIAL"],
+[9082,"TAL","KINE207","301","RAZONAMIENTO EN KINESIOLOGIA",16,"Felipe Carrasco Silva","MA 08:30 A 12:00 VM-KIN226","PRESENCIAL"],
+[9083,"TAL","KINE207","302","RAZONAMIENTO EN KINESIOLOGIA",16,"Felipe Carrasco Silva","MI 08:30 A 12:00 VM-KIN222","PRESENCIAL"],
+[9084,"TAL","KINE207","303","RAZONAMIENTO EN KINESIOLOGIA",16,"Felipe Carrasco Silva","LU 08:30 A 12:00 VM-KIN223","PRESENCIAL"],
+[9085,"TAL","KINE207","304","RAZONAMIENTO EN KINESIOLOGIA",16,"Felipe Carrasco Silva","VI 08:30 A 12:00 VM-KIN228","PRESENCIAL"],
+[9086,"TAL","KINE207","305","RAZONAMIENTO EN KINESIOLOGIA",16,"Rodrigo Munoz Romero","MI 14:00 A 17:30 VM-KIN227","PRESENCIAL"],
+[9087,"TAL","KINE207","306","RAZONAMIENTO EN KINESIOLOGIA",16,"Andrea Zuniga Honorato","MA 09:25 A 12:55 VM-KIN220","PRESENCIAL"],
+[9088,"TAL","KINE207","307","RAZONAMIENTO EN KINESIOLOGIA",16,"Veronica Ojeda Cardenas","LU 16:45 A 18:25 VM-KIN221 ; MI 16:45 A 18:25 VM-KIN225","PRESENCIAL"],
+[9089,"TAL","KINE207","308","RAZONAMIENTO EN KINESIOLOGIA",16,"Veronica Ojeda Cardenas","JU 14:00 A 17:30 VM-KIN224","PRESENCIAL"],
+[9090,"TAL","KINE207","309","RAZONAMIENTO EN KINESIOLOGIA",16,"Andrea Zuniga Honorato","LU 12:10 A 15:40 VM-KIN228","PRESENCIAL"],
+[9091,"TAL","KINE207","310","RAZONAMIENTO EN KINESIOLOGIA",16,"Por definir","JU 08:30 A 12:00 VM-KIN226","PRESENCIAL"],
+[9092,"TEO","KINE208","300","FISIOPATOLOGIA",60,"Carlos Vargas Donoso","VI 08:30 A 12:00 VM-SAL302","PRESENCIAL"],
+[9093,"TEO","KINE208","301","FISIOPATOLOGIA",50,"Maria Vasquez Castro","VI 08:30 A 12:00 VM-SAL206","PRESENCIAL"],
+[9094,"TEO","KINE208","302","FISIOPATOLOGIA",60,"Maria Vasquez Castro","LU 14:00 A 17:30 VM-SAL711","PRESENCIAL"],
+[9095,"TAL","KINE208","303","FISIOPATOLOGIA",13,"Eduardo Rivas Diaz","MA 14:00 A 15:40 VM-KIN224","PRESENCIAL"],
+[9096,"TAL","KINE208","304","FISIOPATOLOGIA",14,"Eduardo Rivas Diaz","MA 15:50 A 17:30 VM-KIN220","PRESENCIAL"],
+[9097,"TAL","KINE208","305","FISIOPATOLOGIA",14,"Eduardo Rivas Diaz","MA 17:40 A 19:20 VM-KIN220","PRESENCIAL"],
+[9098,"TAL","KINE208","306","FISIOPATOLOGIA",13,"Eduardo Rivas Diaz","JU 14:00 A 15:40 VM-KIN227","PRESENCIAL"],
+[9099,"TAL","KINE208","307","FISIOPATOLOGIA",14,"Eduardo Rivas Diaz","JU 15:50 A 17:30 VM-KIN228","PRESENCIAL"],
+[9100,"TAL","KINE208","308","FISIOPATOLOGIA",14,"Eduardo Rivas Diaz","JU 17:40 A 19:20 VM-KIN227","PRESENCIAL"],
+[9101,"TAL","KINE208","309","FISIOPATOLOGIA",14,"Paulina Suazo Farias","MA 15:50 A 17:30 VM-KIN221","PRESENCIAL"],
+[9102,"TAL","KINE208","310","FISIOPATOLOGIA",14,"Paulina Suazo Farias","MA 17:40 A 19:20 VM-KIN221","PRESENCIAL"],
+[9103,"TAL","KINE208","311","FISIOPATOLOGIA",14,"Paulina Suazo Farias","VI 12:10 A 13:50 VM-KIN226","PRESENCIAL"],
+[9104,"TAL","KINE208","312","FISIOPATOLOGIA",14,"Maria Vasquez Castro","LU 17:40 A 19:20 VM-KIN224","PRESENCIAL"],
+[9105,"TAL","KINE208","313","FISIOPATOLOGIA",13,"Por definir","LU 17:40 A 19:20 VM-KIN227","PRESENCIAL"],
+[9106,"TAL","KINE208","314","FISIOPATOLOGIA",14,"Por definir","JU 17:40 A 19:20 VM-KIN225","PRESENCIAL"],
+[3225,"TEO","ING119","300","INGLES I",35,"Cristian Alvarez Albani","MA 08:30 A 11:05 VM-SAL509","BLENDED"],
+[3226,"TEO","ING119","301","INGLES I",35,"Cristian Alvarez Albani","MI 08:30 A 11:05 VM-SAL208","BLENDED"],
+[3227,"TEO","ING119","302","INGLES I",35,"Karem Escudero Escudero","JU 14:00 A 16:35 VM-SAL509","BLENDED"],
+[3228,"TEO","ING119","303","INGLES I",35,"Marco Aracena Rosales","VI 14:00 A 16:35 VM-SAL609","BLENDED"],
+[3229,"TEO","ING119","304","INGLES I",35,"Cristian Alvarez Albani","LU 08:30 A 11:05 VM-SAL509","BLENDED"],
+[3230,"TEO","ING119","305","INGLES I",35,"Macarena Balbontin Pizarro","MA 11:15 A 13:50 VM-SAL210","BLENDED"],
+[3234,"TEO","ING119","309","INGLES I",35,"Karem Escudero Escudero","MI 11:15 A 13:50 VM-SAL210","BLENDED"],
+[9107,"TAL","KINE209","300","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Claudio Palacios Mellado","MI 14:00 A 17:30 VM-KIN223","PRESENCIAL"],
+[9108,"TAL","KINE209","301","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Claudio Palacios Mellado","JU 14:00 A 17:30 VM-KIN220","PRESENCIAL"],
+[9109,"TAL","KINE209","302","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Bastian Guerra Araya","JU 08:30 A 12:00 VM-KIN223","PRESENCIAL"],
+[9110,"TAL","KINE209","303","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Bastian Guerra Araya","MI 08:30 A 12:00 VM-KIN223","PRESENCIAL"],
+[9111,"TAL","KINE209","304","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Pablo Hernandez Araya","VI 13:05 A 16:35 VM-KIN220","PRESENCIAL"],
+[9112,"TAL","KINE209","305","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Pablo Hernandez Araya","VI 09:25 A 12:55 VM-KIN223","PRESENCIAL"],
+[9113,"TAL","KINE209","306","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Sebastian Gonzalez Kroyer","JU 12:10 A 13:50 VM-KIN220 ; MI 12:10 A 13:50 VM-KIN223","PRESENCIAL"],
+[9114,"TAL","KINE209","307","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Sebastian Gonzalez Kroyer","MA 12:10 A 15:40 VM-KIN221","PRESENCIAL"],
+[9115,"TAL","KINE209","308","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Sebastian Gonzalez Kroyer","LU 12:10 A 15:40 VM-KIN220","PRESENCIAL"],
+[9116,"TAL","KINE209","309","CONTROL Y ANALISIS KINESIOLOGICO DEL MOVIMIENTO HUMANO",16,"Por definir","VI 15:50 A 19:20 VM-KIN225","PRESENCIAL"],
+[9040,"TAL","KINE103","300","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Carolina Uribe Aranda","MA 14:00 A 17:30 VM-KIN227","PRESENCIAL"],
+[9041,"TAL","KINE103","301","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Sebastian Vasquez Marin","LU 14:00 A 17:30 VM-SAL113","PRESENCIAL"],
+[9042,"TAL","KINE103","302","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Carolina Uribe Aranda","JU 14:00 A 17:30 VM-KIN225","PRESENCIAL"],
+[9043,"TAL","KINE103","303","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Carolina Uribe Aranda","LU 13:05 A 16:35 VM-SAL618","PRESENCIAL"],
+[9117,"TAL","KINE315","300","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Veronica Ojeda Cardenas","LU 14:00 A 16:35 VM-KIN221 ; MI 14:00 A 16:35 VM-KIN228","PRESENCIAL"],
+[9118,"TAL","KINE315","301","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Veronica Ojeda Cardenas","MA 14:00 A 16:35 VM-KIN226 ; VI 14:00 A 16:35 VM-KIN226","PRESENCIAL"],
+[9119,"TAL","KINE315","302","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Carlos Navarro Barria","JU 13:05 A 15:40 VM-KIN223 ; MI 13:05 A 15:40 VM-KIN222","PRESENCIAL"],
+[9120,"TAL","KINE315","303","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Carlos Navarro Barria","MI 15:50 A 18:25 VM-KIN222 ; JU 15:50 A 18:25 VM-KIN223","PRESENCIAL"],
+[9121,"TAL","KINE315","304","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Oriana Rozas Maureira","MA 08:30 A 11:05 VM-KIN225 ; MI 08:30 A 11:05 VM-KIN225","PRESENCIAL"],
+[9122,"TAL","KINE315","305","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Oriana Rozas Maureira","MA 11:15 A 13:50 VM-KIN225 ; MI 11:15 A 13:50 VM-KIN225","PRESENCIAL"],
+[9123,"TAL","KINE315","306","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Oriana Rozas Maureira","LU 14:55 A 17:30 VM-KIN227 ; JU 14:55 A 17:30 VM-KIN227","PRESENCIAL"],
+[9124,"TAL","KINE315","307","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Carlos Navarro Barria","LU 13:05 A 15:40 VM-KIN225 ; MA 13:05 A 15:40 VM-KIN220","PRESENCIAL"],
+[9125,"TAL","KINE315","308","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Claudio Palacios Mellado","JU 08:30 A 11:05 VM-KIN225 ; LU 08:30 A 11:05 VM-KIN225","PRESENCIAL"],
+[9126,"TAL","KINE315","309","EVALUACION Y DIAGNOSTICO EN KINESIOLOGIA MUSCULO ESQUELETICO",16,"Por definir","LU 16:45 A 20:15 VM-KIN222 ; VI 12:10 A 13:50 VM-KIN227","PRESENCIAL"],
+[9045,"TAL","KINE103","305","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Veronica Aparici Rodriguez","MA 14:00 A 17:30 VM-ATM203","PRESENCIAL"],
+[9046,"TAL","KINE103","306","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Veronica Aparici Rodriguez","VI 08:30 A 12:00 VM-KIN224","PRESENCIAL"],
+[9047,"TAL","KINE103","307","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Alejandra Salinas Molina","MI 13:05 A 16:35 VM-SAL613","PRESENCIAL"],
+[9048,"TAL","KINE103","308","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Maria Contreras Bernal","JU 15:50 A 19:20 VM-KIN222","PRESENCIAL"],
+[9049,"TAL","KINE103","309","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Alejandra Salinas Molina","MA 08:30 A 12:00 VM-SAL614","PRESENCIAL"],
+[9050,"TAL","KINE103","310","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Victor Haussmann Lopez","LU 11:15 A 12:55 VM-SAL113 ; MA 17:40 A 19:20 VM-SAL113","PRESENCIAL"],
+[9051,"TAL","KINE103","311","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Sebastian Vasquez Marin","JU 13:05 A 16:35 VM-KIN221","PRESENCIAL"],
+[9052,"TAL","KINE103","312","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Sebastian Vasquez Marin","MI 15:50 A 19:20 VM-KIN221","PRESENCIAL"],
+[9044,"TAL","KINE103","304","DESARROLLO SENSORIOMOTRIZ EN KINESIOLOGIA",16,"Sebastian Vasquez Marin","VI 14:00 A 17:30 VM-SAL618","PRESENCIAL"],
+[9127,"TAL","KINE316","300","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Paula Lamas Soto","MA 16:45 A 19:20 VM-KIN228 ; JU 16:45 A 19:20 VM-KIN221","PRESENCIAL"],
+[9128,"TAL","KINE316","301","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Paula Lamas Soto","LU 16:45 A 19:20 VM-SAL107 ; MI 16:45 A 19:20 VM-SAL116","PRESENCIAL"],
+[9129,"TAL","KINE316","302","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Gabriela Calderon Palacios","JU 08:30 A 11:05 VM-KIN227 ; MA 08:30 A 11:05 VM-KIN227","PRESENCIAL"],
+[9130,"TAL","KINE316","303","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Gabriela Calderon Palacios","JU 12:10 A 14:45 VM-KIN226 ; MA 12:10 A 14:45 VM-KIN226","PRESENCIAL"],
+[9131,"TAL","KINE316","304","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Por definir","JU 11:15 A 13:50 VM-KIN222 ; MA 11:15 A 13:50 VM-KIN222","PRESENCIAL"],
+[9132,"TAL","KINE316","305","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Por definir","JU 08:30 A 11:05 VM-KIN222 ; MA 08:30 A 11:05 VM-KIN222","PRESENCIAL"],
+[9133,"TAL","KINE316","306","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Gigliola Piano Villavicencio","MI 08:30 A 11:05 VM-KIN227 ; JU 11:15 A 13:50 VM-KIN227","PRESENCIAL"],
+[9134,"TAL","KINE316","307","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Gigliola Piano Villavicencio","VI 08:30 A 11:05 VM-KIN227 ; JU 08:30 A 11:05 VM-KIN228","PRESENCIAL"],
+[9135,"TAL","KINE316","308","EVALUACION Y DIAGNOSTICO EN NEUROKINESIOLOGIA",16,"Por definir","MA 17:40 A 20:15 VM-KIN226 ; MI 17:40 A 20:15 VM-KIN227","PRESENCIAL"],
+[1711,"TEO","BIOL038","300","BASES QUIMICO-BIOLOGICAS DE LA CELULA",60,"Ximena Ortega Alonso","MA 15:50 A 17:30 VM-SAL701 ; MI 15:50 A 17:30 VM-E-SAL126 ; JU 15:50 A 17:30 VM-SAL205","PRESENCIAL"],
+[1787,"TEO","BIOL188","300","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",55,"Nelson Araya Astudillo","LU 08:30 A 11:05 VM-SAL523","PRESENCIAL"],
+[1788,"TEO","BIOL188","301","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",53,"Sebastian Montenegro Perez","LU 08:30 A 11:05 VM-E-SAL125","PRESENCIAL"],
+[1789,"TEO","BIOL188","302","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",50,"Nelson Araya Astudillo","JU 12:10 A 14:45 VM-SAL503","PRESENCIAL"],
+[1790,"TAL","BIOL188","303","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Sebastian Montenegro Perez","MI 10:20 A 12:00 VM-SAL514","PRESENCIAL"],
+[1791,"TAL","BIOL188","304","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Nelson Araya Astudillo","MI 10:20 A 12:00 VM-SAL507","PRESENCIAL"],
+[1792,"TAL","BIOL188","305","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Sebastian Montenegro Perez","MI 12:10 A 13:50 VM-SAL616","PRESENCIAL"],
+[1793,"TAL","BIOL188","306","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Nelson Araya Astudillo","MI 12:10 A 13:50 VM-SAL607","PRESENCIAL"],
+[1794,"TAL","BIOL188","307","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Sebastian Montenegro Perez","MI 17:40 A 19:20 VM-SAL514","PRESENCIAL"],
+[1795,"TAL","BIOL188","308","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Nelson Araya Astudillo","MI 17:40 A 19:20 VM-SAL616","PRESENCIAL"],
+[1796,"TAL","BIOL188","309","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Nelson Araya Astudillo","MI 14:00 A 15:40 VM-SAL217","PRESENCIAL"],
+[1797,"TEO","BIOL188","310","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",50,"Sebastian Montenegro Perez","JU 12:10 A 14:45 VM-SAL703","PRESENCIAL"],
+[1798,"TAL","BIOL188","311","FISIOLOGIA GENERAL Y NEUROFISIOLOGIA",26,"Sebastian Montenegro Perez","MI 14:00 A 15:40 VM-SAL509","PRESENCIAL"],
+[1814,"TAL","BIOL288","300","FISIOLOGIA DE SISTEMAS",20,"Nelson Araya Astudillo","VI 08:30 A 10:10 VM-SAL514","PRESENCIAL"],
+[1815,"TAL","BIOL288","301","FISIOLOGIA DE SISTEMAS",20,"Nelson Araya Astudillo","VI 10:20 A 12:00 VM-SAL514","PRESENCIAL"],
+[1816,"TAL","BIOL288","302","FISIOLOGIA DE SISTEMAS",20,"Nelson Araya Astudillo","VI 12:10 A 13:50 VM-SAL514","PRESENCIAL"],
+[1817,"TEO","BIOL288","303","FISIOLOGIA DE SISTEMAS",60,"Rodrigo Canas Jamett","MA 15:50 A 18:25 VM-SAL523","PRESENCIAL"],
+[2837,"TAL","CEGPC13","301","PENSAMIENTO CRITICO",45,"Ramon Uzcategui Pacheco","MI 12:10 A 13:50 -","VIRTUAL"],
+[2838,"TAL","CEGPC13","302","PENSAMIENTO CRITICO",45,"Sergio Peralta Venegas","JU 12:10 A 13:50 -","VIRTUAL"],
+[2839,"TAL","CEGPC13","303","PENSAMIENTO CRITICO",45,"Ramon Uzcategui Pacheco","JU 12:10 A 13:50 -","VIRTUAL"]
+  ];
+
+  const DAY_MAP = {LU:'lunes',MA:'martes',MI:'miercoles',JU:'jueves',VI:'viernes',SA:'sabado'};
+  const DAY_LABELS = {lunes:'Lun',martes:'Mar',miercoles:'Mié',jueves:'Jue',viernes:'Vie',sabado:'Sáb'};
+  const COLORS = ['#1B3A3D','#C1443A','#D69A34','#4C8C7D','#4A5C7D','#7A4C6B'];
+  const START_H = 8, END_H = 22;
+  const PX_PER_MIN = 64/60;
+
+  function parseHorario(raw){
+    if(!raw) return [];
+    return raw.split(';').map(s=>s.trim()).filter(Boolean).map(seg=>{
+      const m = seg.match(/^([A-Z]{2})\s+(\d{1,2}:\d{2})\s*A\s*(\d{1,2}:\d{2})\s*(.*)$/i);
+      if(!m) return null;
+      const dia = DAY_MAP[m[1].toUpperCase()];
+      if(!dia) return null;
+      return { dia, inicio: m[2].padStart(5,'0'), fin: m[3].padStart(5,'0'), sala: (m[4]||'').trim().replace(/^-$/, 'Sin sala / Online') };
+    }).filter(Boolean);
+  }
+
+  const COURSES = RAW.map(r=>({
+    nrc:r[0], tipo:r[1], codigo:r[2], seccion:r[3], titulo:r[4], vacantes:r[5], profesor:r[6],
+    segments: parseHorario(r[7]), modalidad:r[8]
+  }));
+
+  function colorForCodigo(codigo){
+    let hash = 0;
+    for(let i=0;i<codigo.length;i++) hash = (hash*31 + codigo.charCodeAt(i)) >>> 0;
+    return COLORS[hash % COLORS.length];
+  }
+
+  /* ---------- STATE ---------- */
+  let classes = []; // {id, groupId, nombre, dia, inicio, fin, sala, profesor, tipo, color, nrc}
+  let selectedColor = COLORS[0];
+  let editingId = null;
+  let showSabado = false;
+  const STORAGE_KEY = 'kine-schedule-unab-v2';
+  const el = id => document.getElementById(id);
+
+  async function loadState(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY);
+      if(res && res.value){
+        const parsed = JSON.parse(res.value);
+        classes = parsed.classes || [];
+        showSabado = !!parsed.showSabado;
+      }
+    }catch(e){}
+    el('toggleSabado').checked = showSabado;
+    renderAll();
+  }
+  async function saveState(){
+    try{ await window.storage.set(STORAGE_KEY, JSON.stringify({classes, showSabado})); }
+    catch(e){ console.error('No se pudo guardar', e); }
+  }
+
+  /* ---------- TABS ---------- */
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      el('tab-'+btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ---------- CATÁLOGO SEARCH ---------- */
+  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function titleCase(s){ return s.toLowerCase().replace(/(^|\s|-)\S/g, c=>c.toUpperCase()); }
+
+  function renderCatalog(query){
+    const wrap = el('catalogResults');
+    if(!query || query.trim().length < 2){
+      wrap.innerHTML = '<p class="catalog-empty">Escribe el nombre de un ramo (ej. "Anatomía", "Inglés", "Fisiología") para ver sus secciones disponibles.</p>';
+      return;
+    }
+    const q = query.trim().toUpperCase();
+    const matches = COURSES.filter(c => c.titulo.includes(q) || c.codigo.includes(q) || String(c.nrc).includes(q));
+    if(matches.length === 0){
+      wrap.innerHTML = '<p class="catalog-empty">No se encontraron secciones para "'+escapeHtml(query)+'".</p>';
+      return;
+    }
+    wrap.innerHTML = matches.slice(0, 60).map(c=>{
+      const already = classes.some(k=>k.nrc===c.nrc);
+      const timeStr = c.segments.map(s=> `${DAY_LABELS[s.dia]} ${s.inicio}–${s.fin}${s.sala?' · '+escapeHtml(s.sala):''}`).join('<br>');
+      return `<div class="sec-card">
+        <div class="sec-top">
+          <span class="badge ${c.tipo}">${c.tipo}</span>
+          <span class="sec-num">Sección ${c.seccion} · NRC ${c.nrc}</span>
+          <span class="sec-modalidad">${c.modalidad}</span>
+        </div>
+        <div class="sec-prof">${titleCase(c.titulo)}</div>
+        <div class="sec-prof mono" style="color:var(--ink-soft); font-size:11.5px;">${escapeHtml(c.profesor)}</div>
+        <div class="sec-time">${timeStr || 'Horario por confirmar'}</div>
+        <div class="sec-foot">
+          <span class="sec-vac">Vacantes: ${c.vacantes}</span>
+          <button type="button" class="small ${already?'ghost':'primary'}" data-nrc="${c.nrc}">${already?'Agregado ✓':'+ Agregar'}</button>
+        </div>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('button[data-nrc]').forEach(btn=>{
+      btn.addEventListener('click', ()=> addCourseByNrc(Number(btn.dataset.nrc)));
+    });
+  }
+
+  el('buscador').addEventListener('input', e=> renderCatalog(e.target.value));
+
+  function addCourseByNrc(nrc){
+    const c = COURSES.find(x=>x.nrc===nrc);
+    if(!c) return;
+    if(classes.some(k=>k.nrc===nrc)) return; // already added
+    if(c.segments.length === 0){
+      alert('Esta sección aún no tiene horario definido en el catálogo (queda "por confirmar").');
+      return;
+    }
+    const color = colorForCodigo(c.codigo);
+    let addedSabado = false;
+    c.segments.forEach(seg=>{
+      if(seg.dia === 'sabado') addedSabado = true;
+      classes.push({
+        id: 'c'+Date.now()+Math.random().toString(16).slice(2),
+        groupId: 'nrc'+c.nrc,
+        nrc: c.nrc,
+        nombre: titleCase(c.titulo) + ' (' + c.tipo + ')',
+        dia: seg.dia, inicio: seg.inicio, fin: seg.fin, sala: seg.sala,
+        profesor: c.profesor, tipo: c.tipo, color
+      });
+    });
+    if(addedSabado && !showSabado){ showSabado = true; el('toggleSabado').checked = true; }
+    renderAll();
+    saveState();
+    renderCatalog(el('buscador').value);
+  }
+
+  /* ---------- MANUAL FORM ---------- */
+  const COLOR_SWATCHES = COLORS;
+  function buildSwatches(){
+    const wrap = el('swatches');
+    wrap.innerHTML = '';
+    COLOR_SWATCHES.forEach(c=>{
+      const s = document.createElement('div');
+      s.className = 'swatch' + (c===selectedColor ? ' selected':'');
+      s.style.background = c;
+      s.addEventListener('click', ()=>{ selectedColor = c; buildSwatches(); });
+      wrap.appendChild(s);
+    });
+  }
+
+  function resetForm(){
+    editingId = null;
+    el('classForm').reset();
+    el('inicio').value = '08:30';
+    el('fin').value = '10:00';
+    selectedColor = COLORS[0];
+    buildSwatches();
+    el('btnSubmit').textContent = 'Agregar';
+    el('btnCancelEdit').style.display = 'none';
+  }
+
+  el('classForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    const nombre = el('nombre').value.trim();
+    const dia = el('dia').value;
+    const inicio = el('inicio').value;
+    const fin = el('fin').value;
+    const tipo = el('tipo').value;
+    const sala = el('sala').value.trim();
+    const profesor = el('profesor').value.trim();
+    if(!nombre){ alert('Ingresa un nombre.'); return; }
+    if(toMinutes(fin) <= toMinutes(inicio)){ alert('La hora de término debe ser posterior a la de inicio.'); return; }
+    if(toMinutes(inicio) < START_H*60 || toMinutes(fin) > END_H*60){ alert(`El horario debe estar entre ${START_H}:00 y ${END_H}:00.`); return; }
+    if(dia === 'sabado' && !showSabado){ showSabado = true; el('toggleSabado').checked = true; }
+
+    if(editingId){
+      const c = classes.find(x=>x.id===editingId);
+      Object.assign(c, {nombre, dia, inicio, fin, tipo, sala, profesor, color:selectedColor});
+    } else {
+      classes.push({ id:'c'+Date.now()+Math.random().toString(16).slice(2), groupId:null, nrc:null, nombre, dia, inicio, fin, tipo, sala, profesor, color:selectedColor });
+    }
+    resetForm();
+    renderAll();
+    saveState();
+  });
+  el('btnCancelEdit').addEventListener('click', resetForm);
+
+  function startEdit(id){
+    const c = classes.find(x=>x.id===id);
+    if(!c || c.groupId){ return; } // catalog blocks aren't edited, only removed
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="manual"]').classList.add('active');
+    el('tab-manual').classList.add('active');
+    editingId = id;
+    el('nombre').value = c.nombre;
+    el('dia').value = c.dia;
+    el('inicio').value = c.inicio;
+    el('fin').value = c.fin;
+    el('tipo').value = c.tipo;
+    el('sala').value = c.sala;
+    el('profesor').value = c.profesor;
+    selectedColor = c.color;
+    buildSwatches();
+    el('btnSubmit').textContent = 'Guardar cambios';
+    el('btnCancelEdit').style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function deleteClass(id){
+    const c = classes.find(x=>x.id===id);
+    if(c && c.groupId){
+      classes = classes.filter(x=>x.groupId!==c.groupId);
+    } else {
+      classes = classes.filter(x=>x.id!==id);
+    }
+    if(editingId===id) resetForm();
+    renderAll();
+    saveState();
+    renderCatalog(el('buscador').value);
+  }
+
+  /* ---------- GRID RENDER ---------- */
+  function activeDays(){
+    const days = ['lunes','martes','miercoles','jueves','viernes'];
+    if(showSabado) days.push('sabado');
+    return days;
+  }
+  function toMinutes(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+
+  function renderGridSkeleton(){
+    const days = activeDays();
+    document.documentElement.style.setProperty('--ndays', days.length);
+    el('gridHeader').innerHTML = '<div class="corner"></div>' + days.map(d=>`<div class="day-head">${DAY_LABELS[d]}</div>`).join('');
+    const totalHeight = (END_H-START_H)*64;
+    const body = el('gridBody');
+    body.innerHTML = '';
+    const timeCol = document.createElement('div');
+    timeCol.className = 'time-col';
+    timeCol.style.height = totalHeight + 'px';
+    for(let h=START_H; h<=END_H; h++){
+      const lbl = document.createElement('div');
+      lbl.className = 'hour-label';
+      lbl.style.top = ((h-START_H)*64) + 'px';
+      lbl.textContent = String(h).padStart(2,'0') + ':00';
+      timeCol.appendChild(lbl);
+    }
+    body.appendChild(timeCol);
+    days.forEach(d=>{
+      const col = document.createElement('div');
+      col.className = 'day-col';
+      col.dataset.day = d;
+      col.style.height = totalHeight + 'px';
+      body.appendChild(col);
+    });
+  }
+
+  function renderBlocks(){
+    classes.forEach(c=>{
+      const col = document.querySelector(`.day-col[data-day="${c.dia}"]`);
+      if(!col) return;
+      const startMin = toMinutes(c.inicio), endMin = toMinutes(c.fin);
+      const top = (startMin - START_H*60) * PX_PER_MIN;
+      const height = Math.max((endMin-startMin) * PX_PER_MIN, 26);
+      const b = document.createElement('div');
+      b.className = 'block' + (c.tipo==='TAL' ? ' TAL' : '');
+      b.style.top = top + 'px';
+      b.style.height = height + 'px';
+      b.style.background = c.color;
+      b.innerHTML = `<span class="bclose" data-id="${c.id}">×</span>
+        <span class="bname">${escapeHtml(c.nombre)}${c.nrc ? ' <span class=\"bnrc\">NRC '+c.nrc+'</span>' : ''}</span>
+        <span class="bmeta">${c.inicio}–${c.fin}${c.sala ? ' · '+escapeHtml(c.sala):''}</span>`;
+      b.addEventListener('click', (ev)=>{
+        if(ev.target.classList.contains('bclose')){ ev.stopPropagation(); deleteClass(c.id); }
+        else { startEdit(c.id); }
+      });
+      col.appendChild(b);
+    });
+  }
+
+  function renderLegend(){
+    const wrap = el('legendList');
+    if(classes.length === 0){ wrap.innerHTML = '<p class="empty-legend">Aún no agregas ninguna clase.</p>'; return; }
+    const order = {lunes:0,martes:1,miercoles:2,jueves:3,viernes:4,sabado:5};
+    const groups = {};
+    classes.forEach(c=>{
+      const key = c.groupId || c.id;
+      if(!groups[key]) groups[key] = { rep:c, items:[] };
+      groups[key].items.push(c);
+    });
+    const sortedGroups = Object.values(groups).sort((a,b)=>{
+      const x=a.items[0], y=b.items[0];
+      return (order[x.dia]-order[y.dia]) || toMinutes(x.inicio)-toMinutes(y.inicio);
+    });
+    wrap.innerHTML = sortedGroups.map(g=>{
+      const rep = g.rep;
+      const timeStr = g.items.sort((a,b)=>order[a.dia]-order[b.dia]).map(i=>`${DAY_LABELS[i.dia]} ${i.inicio}-${i.fin}`).join(' · ');
+      return `<div class="legend-item">
+        <span class="legend-dot" style="background:${rep.color}"></span>
+        <span class="legend-text">
+          <span class="lname">${escapeHtml(rep.nombre)}${rep.nrc ? ' · NRC '+rep.nrc : ''}</span><br>
+          <span class="lmeta">${timeStr} · ${escapeHtml(rep.tipo||'')}</span>
+        </span>
+        <button type="button" class="legend-del" data-id="${rep.id}" title="Eliminar">✕</button>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.legend-del').forEach(btn=> btn.addEventListener('click', ()=> deleteClass(btn.dataset.id)));
+  }
+
+  function renderAll(){ renderGridSkeleton(); renderBlocks(); renderLegend(); }
+
+  el('toggleSabado').addEventListener('change', function(){ showSabado = this.checked; renderAll(); saveState(); });
+  el('btnClear').addEventListener('click', function(){
+    if(classes.length===0) return;
+    if(confirm('¿Eliminar todos los bloques del horario?')){ classes = []; resetForm(); renderAll(); saveState(); renderCatalog(el('buscador').value); }
+  });
+  el('btnPrint').addEventListener('click', ()=> window.print());
+
+  buildSwatches();
+  loadState();
+})();
+
+
+
+</script>
+</body>
+</html>
